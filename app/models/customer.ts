@@ -1,6 +1,10 @@
-import type { IAudit } from "./audit";
+import type {
+  DocumentData,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+} from "firebase/firestore";
 
-export interface ICustomer extends IAudit {
+export interface ICustomer {
   id: string;
   identity: string;
   name: string;
@@ -26,47 +30,21 @@ export class Customer implements ICustomer {
   }
 }
 
-// export const customerConverter = {
-//   toFirestore: (customer: Customer) => {
-//     return {
-//       type: customer.type,
-//       identity: customer.identity,
-//       name: customer.name,
-//       monthlyIncome: customer.monthlyIncome,
-//     };
-//   },
+export const customerConverter = {
+  toFirestore: (customer: ICustomer) => {
+    return {
+      identity: customer.identity,
+      name: customer.name,
+      monthlyIncome: customer.monthlyIncome,
+    };
+  },
 
-//   fromFirestore: (
-//     snapshot: QueryDocumentSnapshot<DocumentData, DocumentData>,
-//     options: SnapshotOptions
-//   ) => {
-//     const data = snapshot.data(options) as Customer;
-//     return new Customer(
-//       snapshot.id,
-//       data.type,
-//       data.identity,
-//       data.name,
-//       data.phone,
-//       data.city,
-//       data.district,
-//       data.address,
-//       data.reference,
-//       data.coordenada,
-//       data.debt,
-//       data.zone,
-//       data.lastCall,
-//       data.lastSale,
-//       data.envases,
-//       data.totalSale,
-//       data.image,
-//       data.category,
-//       data.createdAt ?? null,
-//       data.updatedAt ?? null,
-
-//       data.slug ?? null,
-//       data.owner ?? null,
-//       data.licensePlate ?? null,
-//       data.priceReference ?? null
-//     );
-//   },
-// };
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot<ICustomer, DocumentData>,
+    options: SnapshotOptions
+  ) => {
+    const data = snapshot.data(options);
+    data.id = snapshot.id;
+    return data;
+  },
+};

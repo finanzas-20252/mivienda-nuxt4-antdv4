@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import type { Rule } from "ant-design-vue/es/form";
 import _ from "lodash";
-import type { ICustomer } from "~/models/customer";
+import { EBankType } from "~/enums";
+import type { IBank } from "~/models/bank";
 
 interface Props {
   open: boolean;
-  customer?: ICustomer;
+  bank?: IBank;
 }
 
 const props = defineProps<Props>();
@@ -14,18 +15,20 @@ const emit = defineEmits<{
   onClose: [];
 }>();
 
-const customerId = ref<string>();
+const bankId = ref<string>();
 
-const { addCustomer, updateCustomer } = useCrudCustomers();
+const { addBank, updateBank } = useCrudBanks();
 
 const loading = ref(false);
 const formRef = ref();
-const formState = reactive<Partial<ICustomer>>({});
+const formState = reactive<Partial<IBank>>({
+  type: EBankType.banco,
+});
 
 onMounted(() => {
-  if (props.customer) {
-    Object.assign(formState, props.customer);
-    customerId.value = props.customer.id;
+  if (props.bank) {
+    Object.assign(formState, props.bank);
+    bankId.value = props.bank.id;
   }
 });
 
@@ -56,12 +59,12 @@ const handleOk = () => {
     .then(async () => {
       try {
         loading.value = true;
-        if (props.customer) {
-          await updateCustomer(props.customer.id, _.cloneDeep(formState));
+        if (props.bank) {
+          await updateBank(props.bank.id, _.cloneDeep(formState));
         } else {
-          await addCustomer(_.cloneDeep(formState));
+          await addBank(_.cloneDeep(formState));
         }
-        notificationSuccess(`Cliente ${props.customer ? "editado" : "creado"}`);
+        notificationSuccess(`Cliente ${props.bank ? "editado" : "creado"}`);
         emit("onClose");
       } catch (error: any) {
         modalError(error.message);
@@ -99,25 +102,32 @@ const layout = {
 
     <div class="pt-4">
       <a-form ref="formRef" :model="formState" :rules="rules" v-bind="layout">
-        <a-form-item label="DNI/RUC" name="identity">
+        <a-form-item label="RUC" name="ruc">
           <a-input
-            v-model:value="formState.identity"
-            placeholder="Ingresar DNI/RUC!"
+            v-model:value="formState.ruc"
+            placeholder="Ingresar RUC!"
           ></a-input>
         </a-form-item>
 
-        <a-form-item label="Nombre Completo" name="name">
+        <a-form-item label="Nombre" name="name">
           <a-input
             v-model:value="formState.name"
-            placeholder="Ingresar nombre completo!"
+            placeholder="Ingresar nombre!"
           ></a-input>
         </a-form-item>
 
-        <a-form-item label="Ingreso Mensual" name="monthlyIncome">
-          <a-input-number
-            v-model:value="formState.monthlyIncome"
-            placeholder="Ingresar ingreso mensual!"
-          ></a-input-number>
+        <a-form-item label="Tipo" name="type">
+          <a-select
+            ref="select"
+            v-model:value="formState.type"
+            style="width: 120px"
+          >
+            <a-select-option :value="EBankType.banco">Banco</a-select-option>
+            <a-select-option :value="EBankType.financiera"
+              >financiera</a-select-option
+            >
+            <a-select-option :value="EBankType.cmac">CMAC</a-select-option>
+          </a-select>
         </a-form-item>
       </a-form>
 

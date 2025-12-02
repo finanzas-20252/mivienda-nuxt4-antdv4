@@ -1,6 +1,6 @@
 import type { IAudit } from "./audit";
 
-export interface ISchedule extends IAudit {
+export interface ISchedule {
   id: string;
   numeroCuotas: number;
   fechaPago: Date;

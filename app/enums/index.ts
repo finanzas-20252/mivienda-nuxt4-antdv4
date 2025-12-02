@@ -21,8 +21,8 @@ export enum ETipoTasa {
 }
 
 export enum ETipoBono {
+  ninguno = "ninguno",
   techoProprio = "techoPropio",
-  otro = "otro",
 }
 
 export enum ETipoGracia {
@@ -35,4 +35,12 @@ export enum ELoanStatus {
   pending = "pending",
   approved = "approved",
   rejected = "rejected",
+}
+
+export enum ECapitalizationFrequency {
+  mensual = "mensual",
+  bimestral = "bimestral",
+  trimestral = "trimestral",
+  semestral = "semestral",
+  anual = "anual",
 }
