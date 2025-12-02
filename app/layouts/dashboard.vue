@@ -40,9 +40,13 @@ const theme = reactive({
   <a-config-provider :locale="locale" :theme="theme">
     <a-layout has-sider>
       <SiderMain />
-      <a-layout class="min-h-screen">
-        <!-- <HeaderMain /> -->
-        <a-layout-content class="mx-4 my-4 over">
+      <a-layout>
+        <a-layout-header>
+          <!-- <span class="text-lg font-bold"><BarChartOutlined /> Escritorio</span> -->
+          <!-- <MenuNavDashboard /> -->
+        </a-layout-header>
+        <br />
+        <a-layout-content>
           <slot />
         </a-layout-content>
       </a-layout>
