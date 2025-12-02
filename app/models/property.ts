@@ -1,10 +1,14 @@
+import type {
+  DocumentData,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+} from "firebase/firestore";
 import type { ECurrency, EPropertyStatus } from "~/enums";
-import type { IAudit } from "./audit";
 
-export interface IProperty extends IAudit {
+export interface IProperty {
   id: string;
   code: string;
-  NameProject: string;
+  nameProject: string;
   priceReference: number;
   currency: ECurrency;
   status: EPropertyStatus;
@@ -13,7 +17,7 @@ export interface IProperty extends IAudit {
 export class Property implements IProperty {
   id: string;
   code: string;
-  NameProject: string;
+  nameProject: string;
   priceReference: number;
   currency: ECurrency;
   status: EPropertyStatus;
@@ -21,61 +25,37 @@ export class Property implements IProperty {
   constructor(
     id: string,
     code: string,
-    NameProject: string,
+    nameProject: string,
     priceReference: number,
     currency: ECurrency,
     status: EPropertyStatus
   ) {
     this.id = id;
     this.code = code;
-    this.NameProject = NameProject;
+    this.nameProject = nameProject;
     this.priceReference = priceReference;
     this.currency = currency;
     this.status = status;
   }
 }
 
-// export const customerConverter = {
-//   toFirestore: (customer: Customer) => {
-//     return {
-//       type: customer.type,
-//       identity: customer.identity,
-//       name: customer.name,
-//       monthlyIncome: customer.monthlyIncome,
-//     };
-//   },
+export const propertyConverter = {
+  toFirestore: (property: IProperty) => {
+    return {
+      code: property.code,
+      nameProject: property.nameProject,
+      priceReference: property.priceReference,
+      currency: property.currency,
+      status: property.status,
+    };
+  },
 
-//   fromFirestore: (
-//     snapshot: QueryDocumentSnapshot<DocumentData, DocumentData>,
-//     options: SnapshotOptions
-//   ) => {
-//     const data = snapshot.data(options) as Customer;
-//     return new Customer(
-//       snapshot.id,
-//       data.type,
-//       data.identity,
-//       data.name,
-//       data.phone,
-//       data.city,
-//       data.district,
-//       data.address,
-//       data.reference,
-//       data.coordenada,
-//       data.debt,
-//       data.zone,
-//       data.lastCall,
-//       data.lastSale,
-//       data.envases,
-//       data.totalSale,
-//       data.image,
-//       data.category,
-//       data.createdAt ?? null,
-//       data.updatedAt ?? null,
-
-//       data.slug ?? null,
-//       data.owner ?? null,
-//       data.licensePlate ?? null,
-//       data.priceReference ?? null
-//     );
-//   },
-// };
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot<IProperty, DocumentData>,
+    options: SnapshotOptions
+  ) => {
+    const data = snapshot.data(options);
+    data.id = snapshot.id;
+    return data;
+  },
+};

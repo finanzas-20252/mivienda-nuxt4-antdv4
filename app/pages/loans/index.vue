@@ -3,17 +3,17 @@ import type { TableProps } from "ant-design-vue";
 import _ from "lodash";
 
 definePageMeta({
-  name: "Customers",
+  name: "Loans",
 });
 
-const { customers, customersPending: loading } = useCrudCustomers();
+const { loans, loansPending: loading } = useCrudLoans();
 
-const handleRemove = (customerId: string) => {
+const handleRemove = (loanId: string) => {
   Modal.confirm({
     title: "Borrar cliente?",
     onOk: async () => {
       // try {
-      //   await remove(db, customerId)
+      //   await remove(db, loanId)
       //   notificationSuccess('Se removió cliente')
       // } catch (error: any) {
       //   modalError(error.message)
@@ -22,9 +22,9 @@ const handleRemove = (customerId: string) => {
   });
 };
 
-const handleEditCustomer = (customer: any) => {
-  // openEditCustomer.value = true
-  // customerCurrent.value = customer
+const handleEditLoan = (loan: any) => {
+  // openEditLoan.value = true
+  // loanCurrent.value = loan
 };
 
 const columns: TableProps["columns"] = [
@@ -79,12 +79,18 @@ const columns: TableProps["columns"] = [
       </template>
       <template #subTitle>
         <a-space>
-          <AddCustomerButton />
+          <a-button
+            type="primary"
+            @click="$router.push({ name: 'NewLoan', params: { type: 'new' } })"
+          >
+            <template #icon> <PlusOutlined /> </template>
+            Simular Crédito
+          </a-button>
         </a-space>
       </template>
 
       <template #extra>
-        <!-- <AddCategoryCustomerButton /> -->
+        <!-- <AddCategoryLoanButton /> -->
       </template>
     </a-page-header>
 
@@ -99,7 +105,7 @@ const columns: TableProps["columns"] = [
 
       <a-table
         :columns="columns"
-        :data-source="customers"
+        :data-source="loans"
         :loading="loading"
         :scroll="{ x: 900 }"
         bordered
@@ -111,7 +117,7 @@ const columns: TableProps["columns"] = [
 
           <template v-else-if="column.dataIndex === 'identity'">
             <!-- <NuxtLink
-              :to="{ name: 'CustomerDetail', params: { id: record.id } }"
+              :to="{ name: 'LoanDetail', params: { id: record.id } }"
             >
               {{ _.padStart(value, 11, "0") }}
             </NuxtLink> -->
@@ -135,7 +141,7 @@ const columns: TableProps["columns"] = [
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
-                    <a @click="handleEditCustomer(record)">Editar</a>
+                    <a @click="handleEditLoan(record)">Editar</a>
                   </a-menu-item>
                   <a-menu-item>
                     <a @click="handleRemove(record.id)">Eliminar</a>

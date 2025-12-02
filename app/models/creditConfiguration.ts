@@ -1,8 +1,13 @@
 import type { ECurrency, ETipoBono, ETipoTasa } from "~/enums";
 import type { IAudit } from "./audit";
 import type { IBank } from "./bank";
+import type {
+  DocumentData,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+} from "firebase/firestore";
 
-export interface ICreditConfiguration extends IAudit {
+export interface ICreditConfiguration {
   id: string;
   currency: ECurrency;
   tipoTasa: ETipoTasa;
@@ -20,7 +25,7 @@ export interface ICreditConfiguration extends IAudit {
   costoTasacion: number;
   costoNotarial: number;
   costoRegistral: number;
-  bank: IBank;
+  // bank: IBank;
 }
 
 export class CreditConfiguration implements ICreditConfiguration {
@@ -41,7 +46,7 @@ export class CreditConfiguration implements ICreditConfiguration {
   costoTasacion: number;
   costoNotarial: number;
   costoRegistral: number;
-  bank: IBank;
+  // bank: IBank;
 
   constructor(
     id: string,
@@ -60,8 +65,8 @@ export class CreditConfiguration implements ICreditConfiguration {
     tasaSeguroBien: number,
     costoTasacion: number,
     costoNotarial: number,
-    costoRegistral: number,
-    bank: IBank
+    costoRegistral: number
+    // bank: IBank
   ) {
     this.id = id;
     this.currency = currency;
@@ -80,51 +85,39 @@ export class CreditConfiguration implements ICreditConfiguration {
     this.costoTasacion = costoTasacion;
     this.costoNotarial = costoNotarial;
     this.costoRegistral = costoRegistral;
-    this.bank = bank;
+    // this.bank = bank;
   }
 }
 
-// export const customerConverter = {
-//   toFirestore: (customer: CreditConfiguration) => {
-//     return {
-//       type: customer.type,
-//       identity: customer.identity,
-//       name: customer.name,
-//       monthlyIncome: customer.monthlyIncome,
-//     };
-//   },
+export const creditConfigurationConverter = {
+  toFirestore: (creditConfiguration: ICreditConfiguration) => {
+    return {
+      currency: creditConfiguration.currency,
+      tipoTasa: creditConfiguration.tipoTasa,
+      valorTasa: creditConfiguration.valorTasa,
+      capitalizacion: creditConfiguration.capitalizacion,
+      plazoMinimo: creditConfiguration.plazoMinimo,
+      plazoMaximo: creditConfiguration.plazoMaximo,
+      plazoGraciaTotal: creditConfiguration.plazoGraciaTotal,
+      plazoGraciaParcial: creditConfiguration.plazoGraciaParcial,
+      aplicaBono: creditConfiguration.aplicaBono,
+      tipoBono: creditConfiguration.tipoBono,
+      montoBonoMax: creditConfiguration.montoBonoMax,
+      tasaSeguroDesgravamen: creditConfiguration.tasaSeguroDesgravamen,
+      tasaSeguroBien: creditConfiguration.tasaSeguroBien,
+      costoTasacion: creditConfiguration.costoTasacion,
+      costoNotarial: creditConfiguration.costoNotarial,
+      costoRegistral: creditConfiguration.costoRegistral,
+      // bank: creditConfiguration.bank,
+    };
+  },
 
-//   fromFirestore: (
-//     snapshot: QueryDocumentSnapshot<DocumentData, DocumentData>,
-//     options: SnapshotOptions
-//   ) => {
-//     const data = snapshot.data(options) as CreditConfiguration;
-//     return new CreditConfiguration(
-//       snapshot.id,
-//       data.type,
-//       data.identity,
-//       data.name,
-//       data.phone,
-//       data.city,
-//       data.district,
-//       data.address,
-//       data.reference,
-//       data.coordenada,
-//       data.debt,
-//       data.zone,
-//       data.lastCall,
-//       data.lastSale,
-//       data.envases,
-//       data.totalSale,
-//       data.image,
-//       data.category,
-//       data.createdAt ?? null,
-//       data.updatedAt ?? null,
-
-//       data.slug ?? null,
-//       data.owner ?? null,
-//       data.licensePlate ?? null,
-//       data.priceReference ?? null
-//     );
-//   },
-// };
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot<ICreditConfiguration, DocumentData>,
+    options: SnapshotOptions
+  ) => {
+    const data = snapshot.data(options);
+    data.id = snapshot.id;
+    return data;
+  },
+};

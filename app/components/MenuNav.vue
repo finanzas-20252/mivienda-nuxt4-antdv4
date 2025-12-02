@@ -1,19 +1,9 @@
 <script lang="ts" setup>
 import {
-  AimOutlined,
-  AuditOutlined,
-  BarChartOutlined,
-  BarcodeOutlined,
   BlockOutlined,
-  CarOutlined,
   ContactsOutlined,
   DollarOutlined,
   FileDoneOutlined,
-  GlobalOutlined,
-  GoldFilled,
-  StockOutlined,
-  TagsOutlined,
-  TeamOutlined,
 } from "@ant-design/icons-vue";
 import type { ItemType, MenuProps } from "ant-design-vue";
 import type { VueElement } from "vue";
@@ -41,7 +31,7 @@ function getItem(
 }
 
 const items: ItemType[] = reactive([
-  getItem("Escritorio", "Dashboard", () => h(BarChartOutlined)),
+  // getItem("Escritorio", "Dashboard", () => h(BarChartOutlined)),
   getItem("Prestamos", "Loans", () => h(FileDoneOutlined)),
   getItem("Entidades Financieras", "Banks", () => h(DollarOutlined)),
   getItem("Inmuebles", "Properties", () => h(BlockOutlined)),

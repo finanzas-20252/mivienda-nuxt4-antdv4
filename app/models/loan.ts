@@ -1,10 +1,16 @@
-import type { ECurrency, ELoanStatus, ETipoTasa } from "~/enums";
-import type { IAudit } from "./audit";
+import type { Dayjs } from "dayjs";
+import type {
+  DocumentData,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+  Timestamp,
+} from "firebase/firestore";
+import type { ECurrency, ELoanStatus, ETipoBono, ETipoTasa } from "~/enums";
 
-export interface ILoan extends IAudit {
+export interface ILoan {
   id: string;
-  fechaSolicitud: Date;
-  fechaDesembolso: Date;
+  fechaSolicitud: Dayjs | Timestamp | Date;
+  fechaDesembolso: Dayjs | Timestamp | Date;
   montoPrestamo: number;
   currency: ECurrency;
   tipoTasa: ETipoTasa;
@@ -19,16 +25,22 @@ export interface ILoan extends IAudit {
   tir: number;
   tcea: number;
   status: ELoanStatus;
-  customerId: string;
-  propertyId: string;
-  bankId: string;
-  creditConfigurationId: string;
+  tipoBono: ETipoBono;
+  montoBono: number;
+  tasaSeguroDesgravamen: number;
+  tasaSeguroBien: number;
+  costoTasacion: number;
+  costoNotarial: number;
+  costoRegistral: number;
+  cliente: { id: string; name: string };
+  inmueble: { id: string; nameProject: string };
+  entidadFinanciera: { id: string; name: string };
 }
 
 export class Loan implements ILoan {
   id: string;
-  fechaSolicitud: Date;
-  fechaDesembolso: Date;
+  fechaSolicitud: Dayjs | Timestamp | Date;
+  fechaDesembolso: Dayjs | Timestamp | Date;
   montoPrestamo: number;
   currency: ECurrency;
   tipoTasa: ETipoTasa;
@@ -43,10 +55,18 @@ export class Loan implements ILoan {
   tir: number;
   tcea: number;
   status: ELoanStatus;
-  customerId: string;
-  propertyId: string;
-  bankId: string;
+  tipoBono: ETipoBono;
+  montoBono: number;
+  tasaSeguroDesgravamen: number;
+  tasaSeguroBien: number;
+  costoTasacion: number;
+  costoNotarial: number;
+  costoRegistral: number;
+  cliente: { id: string; name: string };
+  inmueble: { id: string; nameProject: string };
+  entidadFinanciera: { id: string; name: string };
   creditConfigurationId: string;
+
   constructor(
     id: string,
     fechaSolicitud: Date,
@@ -65,9 +85,16 @@ export class Loan implements ILoan {
     tir: number,
     tcea: number,
     status: ELoanStatus,
-    customerId: string,
-    propertyId: string,
-    bankId: string,
+    tipoBono: ETipoBono,
+    montoBono: number,
+    tasaSeguroDesgravamen: number,
+    tasaSeguroBien: number,
+    costoTasacion: number,
+    costoNotarial: number,
+    costoRegistral: number,
+    cliente: { id: string; name: string },
+    inmueble: { id: string; nameProject: string },
+    entidadFinanciera: { id: string; name: string },
     creditConfigurationId: string
   ) {
     this.id = id;
@@ -87,54 +114,60 @@ export class Loan implements ILoan {
     this.tir = tir;
     this.tcea = tcea;
     this.status = status;
-    this.customerId = customerId;
-    this.propertyId = propertyId;
-    this.bankId = bankId;
+    this.tipoBono = tipoBono;
+    this.montoBono = montoBono;
+    this.tasaSeguroDesgravamen = tasaSeguroDesgravamen;
+    this.tasaSeguroBien = tasaSeguroBien;
+    this.costoTasacion = costoTasacion;
+    this.costoNotarial = costoNotarial;
+    this.costoRegistral = costoRegistral;
+    this.cliente = cliente;
+    this.inmueble = inmueble;
+    this.entidadFinanciera = entidadFinanciera;
     this.creditConfigurationId = creditConfigurationId;
   }
 }
 
-// export const customerConverter = {
-//   toFirestore: (customer: Loan) => {
-//     return {
-//       type: customer.type,
-//       identity: customer.identity,
-//       name: customer.name,
-//       monthlyIncome: customer.monthlyIncome,
-//     };
-//   },
+export const loanConverter = {
+  toFirestore: (loan: ILoan) => {
+    return {
+      fechaSolicitud: loan.fechaSolicitud,
+      fechaDesembolso: loan.fechaDesembolso,
+      montoPrestamo: loan.montoPrestamo,
+      currency: loan.currency,
+      tipoTasa: loan.tipoTasa,
+      tasaNominal: loan.tasaNominal ?? null,
+      tasaEfectiva: loan.tasaEfectiva,
+      capitalizacion: loan.capitalizacion,
+      plazoMeses: loan.plazoMeses,
+      tipoGracia: loan.tipoGracia,
+      mesesGraciaTotal: loan.mesesGraciaTotal,
+      mesesGraciaParcial: loan.mesesGraciaParcial,
+      van: loan.van,
+      tir: loan.tir,
+      tcea: loan.tcea,
+      status: loan.status,
+      tipoBono: loan.tipoBono,
+      montoBono: loan.montoBono ?? null,
+      tasaSeguroDesgravamen: loan.tasaSeguroDesgravamen,
+      tasaSeguroBien: loan.tasaSeguroBien,
+      costoTasacion: loan.costoTasacion,
+      costoNotarial: loan.costoNotarial,
+      costoRegistral: loan.costoRegistral,
+      cliente: loan.cliente,
+      inmueble: loan.inmueble,
+      entidadFinanciera: loan.entidadFinanciera,
+    };
+  },
 
-//   fromFirestore: (
-//     snapshot: QueryDocumentSnapshot<DocumentData, DocumentData>,
-//     options: SnapshotOptions
-//   ) => {
-//     const data = snapshot.data(options) as Loan;
-//     return new Loan(
-//       snapshot.id,
-//       data.type,
-//       data.identity,
-//       data.name,
-//       data.phone,
-//       data.city,
-//       data.district,
-//       data.address,
-//       data.reference,
-//       data.coordenada,
-//       data.debt,
-//       data.zone,
-//       data.lastCall,
-//       data.lastSale,
-//       data.envases,
-//       data.totalSale,
-//       data.image,
-//       data.category,
-//       data.createdAt ?? null,
-//       data.updatedAt ?? null,
-
-//       data.slug ?? null,
-//       data.owner ?? null,
-//       data.licensePlate ?? null,
-//       data.priceReference ?? null
-//     );
-//   },
-// };
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot<ILoan, DocumentData>,
+    options: SnapshotOptions
+  ) => {
+    const data = snapshot.data(options);
+    data.id = snapshot.id;
+    data.fechaSolicitud = (data.fechaSolicitud as Timestamp)?.toDate();
+    data.fechaDesembolso = (data.fechaDesembolso as Timestamp)?.toDate();
+    return data;
+  },
+};

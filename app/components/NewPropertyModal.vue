@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import type { Rule } from "ant-design-vue/es/form";
 import _ from "lodash";
-import type { ICustomer } from "~/models/customer";
+import { ECurrency, EPropertyStatus } from "~/enums";
+import type { IProperty } from "~/models/property";
 
 interface Props {
   open: boolean;
-  customer?: ICustomer;
+  property?: IProperty;
 }
 
 const props = defineProps<Props>();
@@ -14,18 +15,21 @@ const emit = defineEmits<{
   onClose: [];
 }>();
 
-const customerId = ref<string>();
+const propertyId = ref<string>();
 
-const { addCustomer, updateCustomer } = useCrudCustomers();
+const { addProperty, updateProperty } = useCrudProperties();
 
 const loading = ref(false);
 const formRef = ref();
-const formState = reactive<Partial<ICustomer>>({});
+const formState = reactive<Partial<IProperty>>({
+  currency: ECurrency.soles,
+  status: EPropertyStatus.available,
+});
 
 onMounted(() => {
-  if (props.customer) {
-    Object.assign(formState, props.customer);
-    customerId.value = props.customer.id;
+  if (props.property) {
+    Object.assign(formState, props.property);
+    propertyId.value = props.property.id;
   }
 });
 
@@ -56,12 +60,12 @@ const handleOk = () => {
     .then(async () => {
       try {
         loading.value = true;
-        if (props.customer) {
-          await updateCustomer(props.customer.id, _.cloneDeep(formState));
+        if (props.property) {
+          await updateProperty(props.property.id, _.cloneDeep(formState));
         } else {
-          await addCustomer(_.cloneDeep(formState));
+          await addProperty(_.cloneDeep(formState));
         }
-        notificationSuccess(`Cliente ${props.customer ? "editado" : "creado"}`);
+        notificationSuccess(`Cliente ${props.property ? "editado" : "creado"}`);
         emit("onClose");
       } catch (error: any) {
         modalError(error.message);
@@ -93,31 +97,41 @@ const layout = {
         <template #icon>
           <PlusOutlined />
         </template>
-        Agregar cliente
+        Agregar inmueble
       </a-tag>
     </template>
 
     <div class="pt-4">
       <a-form ref="formRef" :model="formState" :rules="rules" v-bind="layout">
-        <a-form-item label="DNI/RUC" name="identity">
+        <a-form-item label="Código" name="code">
           <a-input
-            v-model:value="formState.identity"
-            placeholder="Ingresar DNI/RUC!"
+            v-model:value="formState.code"
+            placeholder="Ingresar código!"
           ></a-input>
         </a-form-item>
 
-        <a-form-item label="Nombre Completo" name="name">
+        <a-form-item label="Nombre de proyecto" name="nameProject">
           <a-input
-            v-model:value="formState.name"
-            placeholder="Ingresar nombre completo!"
+            v-model:value="formState.nameProject"
+            placeholder="Ingresar nombre de proyecto!"
           ></a-input>
         </a-form-item>
 
-        <a-form-item label="Ingreso Mensual" name="monthlyIncome">
+        <a-form-item label="Precio de referencia" name="priceReference">
           <a-input-number
-            v-model:value="formState.monthlyIncome"
-            placeholder="Ingresar ingreso mensual!"
+            v-model:value="formState.priceReference"
+            placeholder="Ingresar precio referencia!"
           ></a-input-number>
+        </a-form-item>
+        <a-form-item label="Moneda" name="currency">
+          <a-select
+            ref="select"
+            v-model:value="formState.currency"
+            style="width: 120px"
+          >
+            <a-select-option :value="ECurrency.soles">Soles</a-select-option>
+            <a-select-option :value="ECurrency.dollars">Dolar</a-select-option>
+          </a-select>
         </a-form-item>
       </a-form>
 
